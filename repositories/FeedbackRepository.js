@@ -151,7 +151,10 @@ class FeedbackRepository {
       .where(`feedback.${lookupField}`, personId)
       .first();
 
-    if (questionCount.qty !== answerCount.qty) {
+    const questionQuantity = Number.parseInt(questionCount.qty);
+    const answerQuantity = Number.parseInt(answerCount.qty);
+
+    if (answerQuantity < questionQuantity) {
       return;
     }
 
