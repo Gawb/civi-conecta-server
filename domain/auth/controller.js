@@ -66,29 +66,37 @@ const signOut = (_, res) => {
 };
 
 const sendPasswordRecoveryLink = async (req, res) => {
+  
+  const email = req.body.email.trim().toLowerCase();
 
-  const user = await repositories.user.findUserByEmail(req.body.email);
+  try {
+    const user = await repositories.user.findUserByEmail(email);
 
-  if (!user) {
-    return res.status(404).json({ ok: false, message: 'Usuario no encontrado' });
+    if (!user) {
+      return res.status(404).json({ ok: false, message: 'Usuario no encontrado' });
+    }
+
+    const { nanoid } = await import('nanoid');
+    const recoveryToken = nanoid(32);
+    const tokenExpiration = new Date(Date.now() + 3600000);
+
+    await repositories.user.storeRecoveryToken(user.id, recoveryToken, tokenExpiration);
+
+    const recoveryLink = `${config.urls.recoveryPassword}/${recoveryToken}`;
+    const from = config.email.template.name.recoveryPassword;
+    const to = req.body.email;
+    const subject = config.email.template.subject.recoveryPassword;
+    const html = templates.recoverPassword(user.name, recoveryLink);
+
+    await services.email.send({ from, to, subject, html });
+
+    res.json({ ok: true, message: messages.auth.recoverPassword });
+  } catch (err) {
+    console.error('Error in sendPasswordRecoveryLink:', err);
+    res.status(500).json({ ok: false, message: 'Error al enviar el enlace de recuperación' });
   }
-
-  const { nanoid } = await import('nanoid');
-  const recoveryToken = nanoid(32);
-  const tokenExpiration = new Date(Date.now() + 3600000);
-
-  await repositories.user.storeRecoveryToken(user.id, recoveryToken, tokenExpiration);
-
-  const recoveryLink = `${config.urls.recoveryPassword}/${recoveryToken}`;
-  const from = config.email.template.name.recoveryPassword;
-  const to = req.body.email;
-  const subject = config.email.template.subject.recoveryPassword;
-  const html = templates.recoverPassword(user.name, recoveryLink);
-
-  await services.email.send({ from, to, subject, html });
-
-  res.json({ ok: true, message: messages.auth.recoverPassword });
 };
+
 
 const validateRecoveryToken = async (req, res) => {
   const { token } = req.params;

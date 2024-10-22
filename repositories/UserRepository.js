@@ -20,20 +20,27 @@ class UserRepository {
   }
 
   async findUserByEmail(email) {
+
+    const sanitizedEmail = email.trim().toLowerCase();
+
     const entity = await this.connection
       .column({
-        id: 'public.user.id',
-        name: 'public.user.name',
-        email: 'public.user.email',
+        id: 'user.id',
+        name: 'user.name',
+        email: 'user.email',
       })
-      .from('public.user')
-      .where('public.user.email', email)
+      .from('user')
+      .whereRaw('LOWER(public.user.email) = LOWER(?)', [sanitizedEmail])
+      .where('public.user.active', 1)
       .first();
 
     return entity;
   }
 
   async findOneByEmail(email) {
+
+    const sanitizedEmail = email.trim().toLowerCase();
+  
     const entity = await this.connection
       .column({
         id: 'public.user.id',
@@ -45,19 +52,19 @@ class UserRepository {
         user_uuid: 'public.user.uuid',
         encrypted_password: 'public.user.encrypted_password',
         is_custom_planification: 'public.user.is_custom_planification',
-        is_establishment_active: 'establishment.active'
+        is_establishment_active: 'establishment.active',
       })
       .from('public.user')
       .leftJoin('course', 'course.teacher_id', 'public.user.id')
       .leftJoin('establishment', 'course.establishment_id', 'establishment.id')
-      .where('public.user.email', email)
+      .whereRaw('LOWER(public.user.email) = LOWER(?)', [sanitizedEmail])
       .where('public.user.active', 1)
       .first();
 
     if (!entity) {
-      throw new EntityNotFoundError(`No existe el usuario activo con el correo ${email}`);
+      throw new EntityNotFoundError(`No existe el usuario activo con el correo ${sanitizedEmail}`);
     }
-
+  
     return entity;
   }
 
