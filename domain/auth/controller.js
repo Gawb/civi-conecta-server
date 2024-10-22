@@ -82,13 +82,13 @@ const sendPasswordRecoveryLink = async (req, res) => {
 
     await repositories.user.storeRecoveryToken(user.id, recoveryToken, tokenExpiration);
 
-    /* const recoveryLink = `${config.urls.recoveryPassword}/${recoveryToken}`;
+    const recoveryLink = `${config.urls.recoveryPassword}/${recoveryToken}`;
     const from = config.email.template.name.recoveryPassword;
     const to = req.body.email;
     const subject = config.email.template.subject.recoveryPassword;
     const html = templates.recoverPassword(user.name, recoveryLink);
 
-    await services.email.send({ from, to, subject, html }); */
+    //await services.email.send({ from, to, subject, html });
 
     res.json({ ok: true, message: messages.auth.recoverPassword });
   } catch (err) {
