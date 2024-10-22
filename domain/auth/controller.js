@@ -88,7 +88,7 @@ const sendPasswordRecoveryLink = async (req, res) => {
     const subject = config.email.template.subject.recoveryPassword;
     const html = templates.recoverPassword(user.name, recoveryLink);
 
-    //await services.email.send({ from, to, subject, html });
+    await services.email.send({ from, to, subject, html });
 
     res.json({ ok: true, message: messages.auth.recoverPassword });
   } catch (err) {
