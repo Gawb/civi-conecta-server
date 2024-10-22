@@ -70,9 +70,11 @@ const sendPasswordRecoveryLink = async (req, res) => {
   const email = req.body.email.trim().toLowerCase();
 
   try {
-    const user = await repositories.user.findUserByEmail(email);
+    //const user = await repositories.user.findUserByEmail(email);
 
-    if (!user) {
+    console.log('user found: ', user);
+
+    /* if (!user) {
       return res.status(404).json({ ok: false, message: 'Usuario no encontrado' });
     }
 
@@ -80,7 +82,7 @@ const sendPasswordRecoveryLink = async (req, res) => {
     const recoveryToken = nanoid(32);
     const tokenExpiration = new Date(Date.now() + 3600000);
 
-    await repositories.user.storeRecoveryToken(user.id, recoveryToken, tokenExpiration);
+    await repositories.user.storeRecoveryToken(user.id, recoveryToken, tokenExpiration); */
 
     const recoveryLink = `${config.urls.recoveryPassword}/${recoveryToken}`;
     const from = config.email.template.name.recoveryPassword;

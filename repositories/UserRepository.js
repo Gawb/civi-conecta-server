@@ -21,6 +21,8 @@ class UserRepository {
 
   async findUserByEmail(email) {
 
+    console.log('findUserByEmail email: ', email);
+
     const sanitizedEmail = email.trim().toLowerCase();
 
     const entity = await this.connection
@@ -33,6 +35,8 @@ class UserRepository {
       .whereRaw('LOWER(public.user.email) = LOWER(?)', [sanitizedEmail])
       .where('public.user.active', 1)
       .first();
+
+    console.log('findUserByEmail entity: ', entity);
 
     return entity;
   }

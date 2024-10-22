@@ -15,11 +15,11 @@ module.exports = {
   development: {
     client: 'pg',
     connection: {
-      host: '127.0.0.1',
+      host: 'user-prod-us-east-2-1.cluster-cfi5vnucvv3w.us-east-2.rds.amazonaws.com',
       port: 5432,
-      user: 'postgres',
-      password: 'root',
-      database: 'civiconecta'
+      user: 'civi-conecta-server-main-db-0511e79d835885993',
+      password: 'Z1v1pdd6Dwa24C2DzaH7AeEvQXW2NY',
+      database: 'civi-conecta-server-main-db-0511e79d835885993'
     },
     pool: {
       min: 2,
