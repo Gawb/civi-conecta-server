@@ -72,7 +72,7 @@ const sendPasswordRecoveryLink = async (req, res) => {
   try {
     //const user = await repositories.user.findUserByEmail(email);
 
-    console.log('user found: ', user);
+    /* console.log('user found: ', user); */
 
     /* if (!user) {
       return res.status(404).json({ ok: false, message: 'Usuario no encontrado' });
