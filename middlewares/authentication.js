@@ -7,7 +7,7 @@ const _verifyToken = (isByCookiesOrHeaders) => (seed) => (req, res, next) => {
 
   jwt.verify(token, seed, (err, decoded) => {
     if (err) {
-      return res.status(401).json({ ok: false, error: err });
+      return res.status(401).json({ ok: false, error: err});
     }
     req.user = decoded.user;
     next();

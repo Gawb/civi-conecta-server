@@ -78,10 +78,25 @@ class UserRepository {
   }
 
   async updatePassword(userId, password) {
+    const user = await this.connection
+      .select('role', 'recovery_token')
+      .from('user')
+      .where('id', userId)
+      .first();
+  
+    if (!user) {
+      throw new EntityNotFoundError(`No existe el usuario con el ID ${userId}`);
+    }
+  
+    const hashedPassword = user.role === RoleTypes.ADMIN
+      ? passwordHelper.encrypt(password)
+      : password;
     const fields = {
-      encrypted_password: 1,
+      password: hashedPassword,
+      encrypted_password: user.role === RoleTypes.ADMIN ? 1 : 0,
       updated_at: new Date(),
-      password: passwordHelper.encrypt(password)
+      recovery_token: null,
+      recovery_token_expiration: null,
     };
 
     return this.connection('user')
@@ -96,6 +111,32 @@ class UserRepository {
       .where('uuid', uuid)
       .first();
   }
+
+  async storeRecoveryToken(userId, recoveryToken, tokenExpiration) {
+    const fields = {
+      recovery_token: recoveryToken,
+      recovery_token_expiration: tokenExpiration,
+    };
+
+    return this.connection('user')
+      .where('id', userId)
+      .update(fields);
+  }
+
+  findOneByRecoveryToken = async (token) => {
+    const entity = await this.connection
+      .column({
+        id: 'public.user.id',
+        name: 'public.user.name',
+        email: 'public.user.email',
+        recovery_token_expiration: 'public.user.recovery_token_expiration',
+      })
+      .from('public.user')
+      .where('public.user.recovery_token', token)
+      .first();
+
+    return entity;
+  };
 
   findByFeedbackCourseUUID(uuid) {
     return this.connection

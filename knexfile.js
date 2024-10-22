@@ -5,19 +5,36 @@ const config = require('./config');
  * @type { Object.<string, import("knex").Knex.Config> }
  */
 module.exports = {
-  development: {
+  /* development: {
     client: 'sqlite3',
     connection: {
       filename: './dev.sqlite3'
     },
     useNullAsDefault: true
+  }, */
+  development: {
+    client: 'pg',
+    connection: {
+      host: '127.0.0.1',
+      port: 5432,
+      user: 'postgres',
+      password: 'root',
+      database: 'civiconecta'
+    },
+    pool: {
+      min: 2,
+      max: 10
+    },
+    migrations: {
+      tableName: 'knex_migrations'
+    }
   },
   test: {
     client: 'pg',
     connection: {
       host: '127.0.0.1',
       port: 5432,
-      user: 'root',
+      user: 'postgres',
       password: 'root',
       database: 'civiconecta'
     },

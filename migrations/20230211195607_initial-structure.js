@@ -13,6 +13,8 @@ exports.up = async function (knex) {
     t.integer('active').defaultTo(1);
     t.string('role');
     t.integer('is_custom_planification').defaultTo(0);
+    t.string('recovery_token');
+    t.timestamp('recovery_token_expiration');
     t.timestamp('created_at').defaultTo(knex.fn.now());
     t.timestamp('updated_at').defaultTo(knex.fn.now());
   });

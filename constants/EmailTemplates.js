@@ -1,8 +1,15 @@
+function capitalizeFirstLetter(string) {
+  if (!string) return '';
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 const templates = {
-  recoverPassword(name, password) {
+  recoverPassword(name, link) {
     return `
-      <p>Hola ${name}</p>
-      <p>Esta es tu nueva clave para ingresar a civiconecta.cl: ${password}</p>
+      <p>Hola ${capitalizeFirstLetter(name)},</p>
+      <p>Para recuperar tu contraseña, haz clic en el siguiente enlace:</p>
+      <a href="${link}">Recuperar contraseña</a>
+      <p>Este enlace expirará en 1 hora.</p>
       <p>Atte. Equipo civiconecta.cl</p>
     `;
   }

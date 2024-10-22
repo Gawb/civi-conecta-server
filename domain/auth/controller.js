@@ -65,6 +65,83 @@ const signOut = (_, res) => {
   res.json({ ok: true, message: messages.auth.logout });
 };
 
+const sendPasswordRecoveryLink = async (req, res) => {
+
+  const user = await repositories.user.findOneByEmail(req.body.email);
+
+  if (!user) {
+    return res.status(404).json({ ok: false, message: 'Usuario no encontrado' });
+  }
+
+  const { nanoid } = await import('nanoid');
+  const recoveryToken = nanoid(32);
+  const tokenExpiration = new Date(Date.now() + 3600000);
+
+  await repositories.user.storeRecoveryToken(user.id, recoveryToken, tokenExpiration);
+
+  const recoveryLink = `${config.urls.recoveryPassword}/${recoveryToken}`;
+  const from = config.email.template.name.recoveryPassword;
+  const to = req.body.email;
+  const subject = config.email.template.subject.recoveryPassword;
+  const html = templates.recoverPassword(user.name, recoveryLink);
+
+  await services.email.send({ from, to, subject, html });
+
+  res.json({ ok: true, message: messages.auth.recoverPassword });
+};
+
+const validateRecoveryToken = async (req, res) => {
+  const { token } = req.params;
+
+  try {
+    const user = await repositories.user.findOneByRecoveryToken(token);
+
+    if (!user) {
+      return res.status(404).json({ ok: false, message: 'Enlace no válido' });
+    }
+
+    const now = new Date();
+    const tokenExpiration = new Date(user.recovery_token_expiration);
+
+    if (now > tokenExpiration) {
+      return res.status(400).json({ ok: false, message: 'El enlace ha expirado' });
+    }
+
+    res.json({ ok: true, message: 'El token es válido', email: user.email });
+  } catch (error) {
+    console.error('Error validating recovery token:', error);
+    res.status(500).json({ ok: false, message: 'Error al validar el token' });
+  }
+};
+
+const updatePassword = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await repositories.user.findOneByEmail(email);
+
+    if (!user) {
+      return res.status(404).json({
+        ok: false,
+        message: 'Usuario no encontrado',
+      });
+    }
+
+    await repositories.user.updatePassword(user.id, password);
+
+    res.json({
+      ok: true,
+      message: 'Contraseña actualizada correctamente',
+    });
+  } catch (err) {
+    console.error('Error updating password:', err);
+    res.status(500).json({
+      ok: false,
+      message: 'Error al actualizar la contraseña',
+    });
+  }
+};
+
 const sendRecoverPassword = async (req, res) => {
   const user = await repositories.user.findOneByEmail(req.body.email);
   const { nanoid } = await import('nanoid');
@@ -128,6 +205,9 @@ module.exports = wrapRequests({
   signIn,
   signOut,
   sendRecoverPassword,
+  sendPasswordRecoveryLink,
+  validateRecoveryToken,
+  updatePassword,
   signUpAdmin,
   signUpUser,
   verifyStudent

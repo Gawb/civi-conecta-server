@@ -47,7 +47,7 @@ const config = {
   email: {
     template: {
       subject: {
-        recoveryPassword: getEnv('EMAIL_SUBJECT_RECOVERY_PASSWORD', 'Recovery Password'),
+        recoveryPassword: getEnv('EMAIL_SUBJECT_RECOVERY_PASSWORD', 'Correo de recuperación'),
         surveyStudents: getEnv('EMAIL_SUBJECT_SURVEY_STUDENTS', 'Survey Students')
       },
       name: {
@@ -56,16 +56,16 @@ const config = {
       }
     },
     transport: {
-      host: getEnv('EMAIL_TRANSPORTER_HOST', ''),
-      port: getEnv('EMAIL_TRANSPORTER_PORT', ''),
-      secure: getEnv('EMAIL_TRANSPORTER_SECURE', ''),
+      host: getEnv('EMAIL_TRANSPORTER_HOST', 'smtp.gmail.com'),
+      port: getEnv('EMAIL_TRANSPORTER_PORT', 587),
+      secure: getEnv('EMAIL_TRANSPORTER_SECURE', false),
       service: getEnv('EMAIL_TRANSPORTER_SERVICE', ''),
-      username: getEnv('EMAIL_TRANSPORTER_USERNAME', ''),
-      password: getEnv('EMAIL_TRANSPORTER_PASSWORD', '')
+      username: getEnv('EMAIL_TRANSPORTER_USERNAME', 'contacto@civiconecta.cl'),
+      password: getEnv('EMAIL_TRANSPORTER_PASSWORD', 'zftp ties zdth ownl')
     }
   },
   urls: {
-    recoveryPassword: getEnv('RECOVERY_PASSWORD_URL', ''),
+    recoveryPassword: getEnv('RECOVERY_PASSWORD_URL', 'http://localhost:3000/create-password'),
     surveyStudents: getEnv('SURVEY_STUDENTS_URL', ''),
     autoLogin: getEnv('AUTO_LOGIN_URL', '')
   }
