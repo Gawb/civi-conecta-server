@@ -19,6 +19,20 @@ class UserRepository {
     }
   }
 
+  async findUserByEmail(email) {
+    const entity = await this.connection
+      .column({
+        id: 'public.user.id',
+        name: 'public.user.name',
+        email: 'public.user.email',
+      })
+      .from('public.user')
+      .where('public.user.email', email)
+      .first();
+
+    return entity;
+  }
+
   async findOneByEmail(email) {
     const entity = await this.connection
       .column({

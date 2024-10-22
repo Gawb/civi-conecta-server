@@ -67,7 +67,7 @@ const signOut = (_, res) => {
 
 const sendPasswordRecoveryLink = async (req, res) => {
 
-  const user = await repositories.user.findOneByEmail(req.body.email);
+  const user = await repositories.user.findUserByEmail(req.body.email);
 
   if (!user) {
     return res.status(404).json({ ok: false, message: 'Usuario no encontrado' });
