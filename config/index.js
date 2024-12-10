@@ -47,6 +47,7 @@ const config = {
   email: {
     template: {
       subject: {
+
         recoveryPassword: getEnv(
           "EMAIL_SUBJECT_RECOVERY_PASSWORD",
           "Correo de recuperación",
@@ -55,6 +56,7 @@ const config = {
           "EMAIL_SUBJECT_SURVEY_STUDENTS",
           "Survey Students",
         ),
+
       },
       name: {
         recoveryPassword: getEnv(
@@ -68,6 +70,7 @@ const config = {
       },
     },
     transport: {
+
       host: getEnv("EMAIL_TRANSPORTER_HOST", "smtp.gmail.com"),
       port: getEnv("EMAIL_TRANSPORTER_PORT", 587),
       secure: getEnv("EMAIL_TRANSPORTER_SECURE", false),
@@ -84,6 +87,7 @@ const config = {
     surveyStudents: getEnv("SURVEY_STUDENTS_URL", ""),
     autoLogin: getEnv("AUTO_LOGIN_URL", ""),
   },
+
 };
 
 config.email.transport.secure = Boolean(config.email.transport.secure);

@@ -64,12 +64,14 @@ const signOut = (_, res) => {
 };
 
 const sendPasswordRecoveryLink = async (req, res) => {
+
   const email = req.body.email.trim().toLowerCase();
 
   try {
     const user = await repositories.user.findUserByEmail(email);
 
     if (!user) {
+
       return res
         .status(404)
         .json({ ok: false, message: "Usuario no encontrado" });
@@ -85,6 +87,7 @@ const sendPasswordRecoveryLink = async (req, res) => {
       tokenExpiration,
     );
 
+
     const recoveryLink = `${config.urls.recoveryPassword}/${recoveryToken}`;
     const from = config.email.template.name.recoveryPassword;
     const to = req.body.email;
@@ -95,6 +98,7 @@ const sendPasswordRecoveryLink = async (req, res) => {
 
     res.json({ ok: true, message: messages.auth.recoverPassword });
   } catch (err) {
+
     console.error("Error in sendPasswordRecoveryLink:", err);
     res.status(500).json({
       ok: false,
@@ -103,6 +107,7 @@ const sendPasswordRecoveryLink = async (req, res) => {
   }
 };
 
+
 const validateRecoveryToken = async (req, res) => {
   const { token } = req.params;
 
@@ -110,13 +115,16 @@ const validateRecoveryToken = async (req, res) => {
     const user = await repositories.user.findOneByRecoveryToken(token);
 
     if (!user) {
+
       return res.status(404).json({ ok: false, message: "Enlace no válido" });
+
     }
 
     const now = new Date();
     const tokenExpiration = new Date(user.recovery_token_expiration);
 
     if (now > tokenExpiration) {
+
       return res
         .status(400)
         .json({ ok: false, message: "El enlace ha expirado" });
@@ -126,6 +134,7 @@ const validateRecoveryToken = async (req, res) => {
   } catch (error) {
     console.error("Error validating recovery token:", error);
     res.status(500).json({ ok: false, message: "Error al validar el token" });
+
   }
 };
 
@@ -138,7 +147,9 @@ const updatePassword = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         ok: false,
+
         message: "Usuario no encontrado",
+
       });
     }
 
@@ -146,6 +157,7 @@ const updatePassword = async (req, res) => {
 
     res.json({
       ok: true,
+
       message: "Contraseña actualizada correctamente",
     });
   } catch (err) {
@@ -153,6 +165,7 @@ const updatePassword = async (req, res) => {
     res.status(500).json({
       ok: false,
       message: "Error al actualizar la contraseña",
+
     });
   }
 };

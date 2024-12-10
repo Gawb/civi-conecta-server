@@ -24,10 +24,12 @@ class UserRepository {
   }
 
   async findUserByEmail(email) {
+
     const sanitizedEmail = email.trim().toLowerCase();
 
     const entity = await this.connection
       .column({
+
         id: "user.id",
         name: "user.name",
         email: "user.email",
@@ -37,10 +39,12 @@ class UserRepository {
       .where("public.user.active", 1)
       .first();
 
+
     return entity;
   }
 
   async findOneByEmail(email) {
+
     const sanitizedEmail = email.trim().toLowerCase();
     const ref = this.connection.ref.bind(this.connection);
 
@@ -84,8 +88,9 @@ class UserRepository {
       throw new EntityNotFoundError(
         `No existe el usuario activo con el correo ${sanitizedEmail}`,
       );
-    }
 
+    }
+  
     return entity;
   }
 
@@ -138,6 +143,7 @@ class UserRepository {
 
   async updatePassword(userId, password) {
     const user = await this.connection
+
       .select("role", "recovery_token")
       .from("public.user")
       .where("id", userId)
@@ -151,6 +157,7 @@ class UserRepository {
       user.role === RoleTypes.ADMIN
         ? passwordHelper.encrypt(password)
         : password;
+
     const fields = {
       password: hashedPassword,
       encrypted_password: user.role === RoleTypes.ADMIN ? 1 : 0,
@@ -176,12 +183,15 @@ class UserRepository {
       recovery_token_expiration: tokenExpiration,
     };
 
+
     return this.connection("public.user").where("id", userId).update(fields);
+
   }
 
   findOneByRecoveryToken = async (token) => {
     const entity = await this.connection
       .column({
+
         id: "public.user.id",
         name: "public.user.name",
         email: "public.user.email",
@@ -189,6 +199,7 @@ class UserRepository {
       })
       .from("public.user")
       .where("public.user.recovery_token", token)
+
       .first();
 
     return entity;

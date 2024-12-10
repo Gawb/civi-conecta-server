@@ -4,6 +4,7 @@ const config = require("./config");
  * @type { Object.<string, import("knex").Knex.Config> }
  */
 module.exports = {
+
   development: {
     client: "pg",
     connection: {
@@ -12,6 +13,7 @@ module.exports = {
       user: "root",
       password: "root",
       database: "civiconecta",
+
     },
     pool: {
       min: 2,
