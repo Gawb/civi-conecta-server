@@ -1,18 +1,22 @@
-const repositories = require('../../repositories');
-const { wrapRequests } = require('../../helpers/controller');
-const exceptions = require('../../repositories/exceptions');
-const dto = require('./dto');
+const repositories = require("../../repositories");
+const { wrapRequests } = require("../../helpers/controller");
+const exceptions = require("../../repositories/exceptions");
+const { ActionNotFoundError } = require("./exceptions");
+const dto = require("./dto");
 
 const getLessonById = async (req, res) => {
-  const lessonId = req.params.lessonId;
+  const lessonId = Number(req.params.lessonId);
   const [lesson, documents] = await Promise.all([
     repositories.lesson.findById(lessonId),
-    repositories.document.findByLesson(lessonId)
+    repositories.document.findByLesson(lessonId),
   ]);
 
   if (!lesson) {
-    throw new exceptions.EntityNotFoundError('La clase no existe');
+    throw new exceptions.EntityNotFoundError("La clase no existe");
   }
+
+  const uuid = req.headers.uuid;
+  await repositories.lessonCourse.createLessonIfNotExists(uuid, lessonId);
 
   res.json({ ok: true, lesson: dto.mapLesson(lesson, documents) });
 };
@@ -23,7 +27,7 @@ const getLessonByEventId = async (req, res) => {
   const documents = await repositories.document.findByLesson(lesson.id);
 
   if (!lesson) {
-    throw new exceptions.EntityNotFoundError('La clase no existe');
+    throw new exceptions.EntityNotFoundError("La clase no existe");
   }
 
   res.json({ ok: true, lesson: dto.mapLesson(lesson, documents) });
@@ -56,7 +60,10 @@ const updateLesson = async (req, res) => {
 const createDocument = async (req, res) => {
   const lessonId = req.params.lessonId;
   const { filename, filepath } = req.body;
-  const documentId = await repositories.document.createLink(lessonId, { filename, filepath });
+  const documentId = await repositories.document.createLink(lessonId, {
+    filename,
+    filepath,
+  });
 
   res.json({ ok: true, documentId });
 };
@@ -76,6 +83,26 @@ const removeDocument = async (req, res) => {
   res.json({ ok: true });
 };
 
+const notifyLessonAction = async (req, res) => {
+  const uuid = req.headers.uuid;
+  const lessonId = req.params.lessonId;
+  const action = req.params.action;
+  let task;
+
+  if (action === "download-content") {
+    task = repositories.lessonCourse.updateDownloadContent(uuid, lessonId);
+  } else if (action === "finish") {
+    task = repositories.lessonCourse.updateFinishLesson(uuid, lessonId);
+  } else {
+    throw new ActionNotFoundError(
+      "action not declared, it must be download-content | finish",
+    );
+  }
+
+  await task;
+  res.json({ ok: true });
+};
+
 module.exports = wrapRequests({
   getLessonById,
   createLesson,
@@ -84,5 +111,6 @@ module.exports = wrapRequests({
   getLessonByEventId,
   createDocument,
   editDocument,
-  removeDocument
+  removeDocument,
+  notifyLessonAction,
 });

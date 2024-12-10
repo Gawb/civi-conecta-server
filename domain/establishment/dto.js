@@ -2,7 +2,7 @@ const mapEstablishment = (establishment) => {
   return {
     id: establishment.id,
     name: establishment.name,
-    active: establishment.active
+    active: establishment.active,
   };
 };
 
@@ -12,7 +12,7 @@ const mapCourse = (course) => {
     level: course.level,
     character: course.character,
     gradeId: course.grade_id,
-    letterId: course.letter_id
+    letterId: course.letter_id,
   };
 };
 
@@ -21,7 +21,7 @@ const mapTeacher = (user) => {
     id: user.id,
     name: user.name,
     email: user.email,
-    active: user.active
+    active: user.active,
   };
 };
 
@@ -30,7 +30,7 @@ const mapProfileInfo = (data) => {
     establishment: data?.establishment_name,
     grade: data?.grade,
     gradeId: data?.grade_id,
-    letter: data?.letter
+    letter: data?.letter,
   };
 };
 
@@ -40,7 +40,17 @@ const mapTeacherInfo = (data) => {
     name: data.teacher_name,
     email: data.teacher_email,
     password: data.passwd,
-    course: `${data.grade} ${data.letter}`
+    course: `${data.grade} ${data.letter}`,
+  };
+};
+
+const mapManager = (data) => {
+  return {
+    id: data.id,
+    name: data.name,
+    email: data.email,
+    uuid: data.uuid,
+    password: data.password,
   };
 };
 
@@ -49,5 +59,6 @@ module.exports = {
   mapTeacher,
   mapProfileInfo,
   mapTeacherInfo,
-  mapCourse
+  mapCourse,
+  mapManager,
 };

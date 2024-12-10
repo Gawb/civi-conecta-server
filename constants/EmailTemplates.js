@@ -1,5 +1,7 @@
 function capitalizeFirstLetter(string) {
-  if (!string) return '';
+
+  if (!string) return "";
+
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
@@ -12,7 +14,7 @@ const templates = {
       <p>Este enlace expirará en 1 hora.</p>
       <p>Atte. Equipo civiconecta.cl</p>
     `;
-  }
+  },
 };
 
 module.exports = templates;

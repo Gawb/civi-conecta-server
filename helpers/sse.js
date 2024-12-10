@@ -1,4 +1,4 @@
-const uuid = require('uuid');
+const { randomUUID } = require("node:crypto");
 
 class EventServer {
   constructor() {
@@ -7,8 +7,8 @@ class EventServer {
 
   add(subscriber) {
     const data = {
-      id: uuid.v4(),
-      writer: subscriber
+      id: randomUUID(),
+      writer: subscriber,
     };
 
     this.subscribers.push(data);
@@ -16,15 +16,15 @@ class EventServer {
     return {
       id: data.id,
       dispose: () => {
-        this.subscribers = this.subscribers.filter(s => s.id !== data.id);
-      }
+        this.subscribers = this.subscribers.filter((s) => s.id !== data.id);
+      },
     };
   }
 
   publish(data) {
     const encodedData = JSON.stringify(data);
 
-    this.subscribers.forEach(subscriber => {
+    this.subscribers.forEach((subscriber) => {
       subscriber.writer.write(`data: ${encodedData}\n\n`);
     });
   }

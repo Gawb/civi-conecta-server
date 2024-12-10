@@ -1,5 +1,5 @@
-const { EventTypes } = require('../../constants/entities');
-const dateHelper = require('../../helpers/date');
+const { EventTypes } = require("../../constants/entities");
+const dateHelper = require("../../helpers/date");
 
 const mapEvent = (data) => {
   return {
@@ -9,13 +9,14 @@ const mapEvent = (data) => {
     description: data.description,
     date: data.date,
     files: data.files,
-    keywords: data.keywords.split(',')
+    keywords: data.keywords.split(","),
+    hasEnteredIntoLesson: Boolean(data.has_entered_into_lesson),
   };
 };
 
-const mapDocument = document => ({
+const mapDocument = (document) => ({
   uuid: document.alias,
-  filename: document.filename
+  filename: document.filename,
 });
 
 const mapEventWithPlanning = (data, documents = []) => {
@@ -35,10 +36,10 @@ const mapEventWithPlanning = (data, documents = []) => {
       mainActivity: data.main_activity,
       endActivity: data.end_activity,
       materials: {
-        teacher: data.teacher_material.split(','),
-        student: data.student_material.split(',')
-      }
-    }
+        teacher: data.teacher_material.split(","),
+        student: data.student_material.split(","),
+      },
+    },
   };
 };
 
@@ -53,7 +54,7 @@ const getEvent = (eventTypeId, data) => {
     eventTypeId,
     get isEphemeris() {
       return this.eventTypeId === EventTypes.EPHEMERIS;
-    }
+    },
   };
 
   if (event.isEphemeris) {
@@ -72,8 +73,8 @@ const getPlanning = (body) => {
     keywords: body.planning.keywords ?? [],
     materials: {
       teacher: body.planning.materials.teacher,
-      student: body.planning.materials.student
-    }
+      student: body.planning.materials.student,
+    },
   };
 };
 
@@ -81,5 +82,5 @@ module.exports = {
   mapEvent,
   getEvent,
   getPlanning,
-  mapEventWithPlanning
+  mapEventWithPlanning,
 };

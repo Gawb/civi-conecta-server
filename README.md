@@ -3,7 +3,7 @@ developed by: https://github.com/aether7
 ## Requirements
 
 
-1. NodeJS v16+
+1. NodeJS v18+
 2. PostgreSQL
 3. SQLite
 4. NPM

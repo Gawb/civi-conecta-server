@@ -4,21 +4,21 @@ const mapUnit = (unit) => {
     number: unit.number,
     description: unit.description,
     title: unit.title,
-    objective: unit.objective
+    objective: unit.objective,
   };
 };
 
 const mapDocument = (data) => {
   return {
     uuid: data.alias,
-    filename: data.filename
+    filename: data.filename,
   };
 };
 
 const mapUnitWithData = (data, documents) => {
-  const toArray = x => x ? x.split(',') : [];
+  const toArray = (x) => (x ? x.split(",") : []);
   const getDocumentsByLesson = (lessonId) =>
-    documents.filter(d => d.lesson_id === lessonId).map(mapDocument);
+    documents.filter((d) => d.lesson_id === lessonId).map(mapDocument);
 
   const lessons = data
     .map((item) => {
@@ -38,11 +38,11 @@ const mapUnitWithData = (data, documents) => {
           mainActivity: item.planning_main_activity,
           endActivity: item.planning_end_activity,
           teacherMaterial: toArray(item.planning_teacher_material),
-          studentMaterial: toArray(item.planning_student_material)
-        }
+          studentMaterial: toArray(item.planning_student_material),
+        },
       };
     })
-    .filter(c => c.id);
+    .filter((c) => c.id);
 
   return {
     id: data[0].id,
@@ -50,17 +50,18 @@ const mapUnitWithData = (data, documents) => {
     title: data[0].title,
     description: data[0].description,
     objective: data[0].objective,
-    lessons
+    lessons,
   };
 };
 
 const mapUnitDashboard = (unit, lessons) => {
-  const mappedLessons = lessons.map(lesson => {
+  const mappedLessons = lessons.map((lesson) => {
     return {
       id: lesson.id,
       number: lesson.number,
       objective: lesson.objective,
-      description: lesson.description
+      description: lesson.description,
+      hasEnteredIntoLesson: Boolean(lesson.has_entered_into_lesson),
     };
   });
 
@@ -70,12 +71,12 @@ const mapUnitDashboard = (unit, lessons) => {
     title: unit.title,
     description: unit.description,
     objective: unit.objective,
-    lessons: mappedLessons
+    lessons: mappedLessons,
   };
 };
 
 module.exports = {
   mapUnit,
   mapUnitWithData,
-  mapUnitDashboard
+  mapUnitDashboard,
 };

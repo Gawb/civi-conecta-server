@@ -209,6 +209,15 @@ class FeedbackRepository {
     return result.id;
   }
 
+  async findUUIDByTeacher (teacherUUID) {
+    return this.connection('feedback_course')
+      .select('feedback_course.uuid')
+      .innerJoin('course', 'feedback_course.course_id', 'course.id')
+      .innerJoin('public.user', 'course.teacher_id', 'public.user.id')
+      .where('public.user.uuid', teacherUUID)
+      .first();
+  }
+
   checkStudentStatusByRut(rut) {
     return this.connection
       .select('feedback.*')
@@ -217,6 +226,22 @@ class FeedbackRepository {
       .where('student.run', rut)
       .orderBy('feedback.id', 'desc')
       .first();
+  }
+
+  async updateGeneratedLink(feedbackCourseUUID) {
+    return this.connection('feedback_course')
+      .update({
+        is_link_generated: 1
+      })
+      .where('uuid', feedbackCourseUUID);
+  }
+
+  async updateDownloadedReport(feedbackCourseUUID){
+    return this.connection('feedback_course')
+    .update({
+      is_report_downloaded: 1
+    })
+    .where('uuid', feedbackCourseUUID);
   }
 }
 

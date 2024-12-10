@@ -1,12 +1,11 @@
-const config = require('../../config');
-const messages = require('../../config/messages');
-const repositories = require('../../repositories');
-const passwordHelper = require('../../helpers/password');
-const services = require('../../services');
-const templates = require('../../constants/EmailTemplates');
-const { wrapRequests } = require('../../helpers/controller');
-const dto = require('./dto');
-
+const config = require("../../config");
+const messages = require("../../config/messages");
+const repositories = require("../../repositories");
+const passwordHelper = require("../../helpers/password");
+const services = require("../../services");
+const templates = require("../../constants/EmailTemplates");
+const { wrapRequests } = require("../../helpers/controller");
+const dto = require("./dto");
 
 class UserWithLogin {
   constructor(data) {
@@ -16,7 +15,7 @@ class UserWithLogin {
 
   get canLogin() {
     const role = this.data.role;
-    const isAdministrator = role === 'Administrator';
+    const isAdministrator = role === "Administrator";
     const hasNoCurrentEstablishmentActive = !!this.data.is_establishment_active;
 
     if (isAdministrator) {
@@ -24,14 +23,14 @@ class UserWithLogin {
     }
 
     if (!isAdministrator && !hasNoCurrentEstablishmentActive) {
-      this.errorMessage = 'El establecimiento esta inactivo, no se puede ingresar';
+      this.errorMessage =
+        "El establecimiento esta inactivo, no se puede ingresar";
       return false;
     }
 
     return true;
   }
 }
-
 
 const signIn = async (req, res) => {
   const { email, password } = req.body;
@@ -42,45 +41,52 @@ const signIn = async (req, res) => {
   if (!isValidUser) {
     return res.status(400).json({
       ok: false,
-      error: messages.auth.notValid
+      error: messages.auth.notValid,
     });
   }
 
   if (!userWithLogin.canLogin) {
     return res.status(400).json({
       ok: false,
-      error: userWithLogin.errorMessage
+      error: userWithLogin.errorMessage,
     });
   }
 
   const loggedUser = dto.mapUser(user);
   const token = services.token.createToken(loggedUser);
   loggedUser.token = token;
-
   res.json({ ok: true, user: loggedUser });
 };
 
 const signOut = (_, res) => {
-  res.clearCookie('token');
+  res.clearCookie("token");
   res.json({ ok: true, message: messages.auth.logout });
 };
 
 const sendPasswordRecoveryLink = async (req, res) => {
-  
+
   const email = req.body.email.trim().toLowerCase();
 
   try {
     const user = await repositories.user.findUserByEmail(email);
 
     if (!user) {
-      return res.status(404).json({ ok: false, message: 'Usuario no encontrado' });
+
+      return res
+        .status(404)
+        .json({ ok: false, message: "Usuario no encontrado" });
     }
 
-    const { nanoid } = await import('nanoid');
+    const { nanoid } = await import("nanoid");
     const recoveryToken = nanoid(32);
     const tokenExpiration = new Date(Date.now() + 3600000);
 
-    await repositories.user.storeRecoveryToken(user.id, recoveryToken, tokenExpiration);
+    await repositories.user.storeRecoveryToken(
+      user.id,
+      recoveryToken,
+      tokenExpiration,
+    );
+
 
     const recoveryLink = `${config.urls.recoveryPassword}/${recoveryToken}`;
     const from = config.email.template.name.recoveryPassword;
@@ -92,8 +98,12 @@ const sendPasswordRecoveryLink = async (req, res) => {
 
     res.json({ ok: true, message: messages.auth.recoverPassword });
   } catch (err) {
-    console.error('Error in sendPasswordRecoveryLink:', err);
-    res.status(500).json({ ok: false, message: 'Error al enviar el enlace de recuperación' });
+
+    console.error("Error in sendPasswordRecoveryLink:", err);
+    res.status(500).json({
+      ok: false,
+      message: "Error al enviar el enlace de recuperación",
+    });
   }
 };
 
@@ -105,20 +115,26 @@ const validateRecoveryToken = async (req, res) => {
     const user = await repositories.user.findOneByRecoveryToken(token);
 
     if (!user) {
-      return res.status(404).json({ ok: false, message: 'Enlace no válido' });
+
+      return res.status(404).json({ ok: false, message: "Enlace no válido" });
+
     }
 
     const now = new Date();
     const tokenExpiration = new Date(user.recovery_token_expiration);
 
     if (now > tokenExpiration) {
-      return res.status(400).json({ ok: false, message: 'El enlace ha expirado' });
+
+      return res
+        .status(400)
+        .json({ ok: false, message: "El enlace ha expirado" });
     }
 
-    res.json({ ok: true, message: 'El token es válido', email: user.email });
+    res.json({ ok: true, message: "El token es válido", email: user.email });
   } catch (error) {
-    console.error('Error validating recovery token:', error);
-    res.status(500).json({ ok: false, message: 'Error al validar el token' });
+    console.error("Error validating recovery token:", error);
+    res.status(500).json({ ok: false, message: "Error al validar el token" });
+
   }
 };
 
@@ -131,7 +147,9 @@ const updatePassword = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         ok: false,
-        message: 'Usuario no encontrado',
+
+        message: "Usuario no encontrado",
+
       });
     }
 
@@ -139,20 +157,22 @@ const updatePassword = async (req, res) => {
 
     res.json({
       ok: true,
-      message: 'Contraseña actualizada correctamente',
+
+      message: "Contraseña actualizada correctamente",
     });
   } catch (err) {
-    console.error('Error updating password:', err);
+    console.error("Error updating password:", err);
     res.status(500).json({
       ok: false,
-      message: 'Error al actualizar la contraseña',
+      message: "Error al actualizar la contraseña",
+
     });
   }
 };
 
 const sendRecoverPassword = async (req, res) => {
   const user = await repositories.user.findOneByEmail(req.body.email);
-  const { nanoid } = await import('nanoid');
+  const { nanoid } = await import("nanoid");
   const newPassword = nanoid(10);
   await repositories.user.updatePassword(user.id, newPassword);
 
@@ -169,7 +189,11 @@ const signUpAdmin = async (req, res) => {
   const name = req.body.name;
   const password = req.body.password;
 
-  const newUser = await repositories.user.createAdmin({ email, name, password });
+  const newUser = await repositories.user.createAdmin({
+    email,
+    name,
+    password,
+  });
   res.json({ ok: true, user: dto.mapUser(newUser) });
 };
 
@@ -196,16 +220,16 @@ const verifyStudent = async (req, res) => {
     uuid: student.uuid,
     name: student.name,
     lastname: student.lastname,
-    role: 'student',
-    active: 1
+    role: "student",
+    active: 1,
   });
   res.json({
     ok: true,
     student: {
       ...student,
       grade,
-      token
-    }
+      token,
+    },
   });
 };
 
@@ -218,5 +242,5 @@ module.exports = wrapRequests({
   updatePassword,
   signUpAdmin,
   signUpUser,
-  verifyStudent
+  verifyStudent,
 });

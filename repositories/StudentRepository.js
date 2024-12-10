@@ -1,4 +1,4 @@
-const uuid = require('uuid');
+const { randomUUID } = require("node:crypto");
 
 class StudentRepository {
   constructor(connection) {
@@ -16,11 +16,7 @@ class StudentRepository {
   }
 
   findByRun(run) {
-    return this.connection
-      .select()
-      .from('student')
-      .where('run', run)
-      .first();
+    return this.connection.select().from("student").where("run", run).first();
   }
 
   async create(student) {
@@ -28,32 +24,32 @@ class StudentRepository {
       name: student.name,
       lastname: student.lastname,
       run: student.run,
-      uuid: uuid.v4()
+      uuid: randomUUID(),
     };
 
     const [result] = await this.connection
-      .insert(fields, ['*'])
-      .into('student');
+      .insert(fields, ["*"])
+      .into("student");
 
     return result;
   }
 
   async findByCourse(courseId) {
     return this.connection
-      .select('student.*')
-      .from('student')
-      .innerJoin('course_student', 'course_student.student_id', 'student.id')
-      .innerJoin('course', 'course_student.course_id', 'course.id')
-      .where('course.id', courseId);
+      .select("student.*")
+      .from("student")
+      .innerJoin("course_student", "course_student.student_id", "student.id")
+      .innerJoin("course", "course_student.course_id", "course.id")
+      .where("course.id", courseId);
   }
 
   async findGradeByRun(run) {
     const result = await this.connection
-      .select('course.grade_id')
-      .from('student')
-      .innerJoin('course_student', 'course_student.student_id', 'student.id')
-      .innerJoin('course', 'course_student.course_id', 'course.id')
-      .where('student.run', run)
+      .select("course.grade_id")
+      .from("student")
+      .innerJoin("course_student", "course_student.student_id", "student.id")
+      .innerJoin("course", "course_student.course_id", "course.id")
+      .where("student.run", run)
       .first();
 
     return result?.grade_id;
