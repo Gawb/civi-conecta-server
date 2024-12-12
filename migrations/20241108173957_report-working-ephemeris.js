@@ -5,6 +5,8 @@
 exports.up = async function (knex) {
   const ref = knex.ref.bind(knex);
 
+  await knex.schema.dropViewIfExists("reports_ephemeris");
+
   await knex.schema.createView("reports_ephemeris", (view) => {
     view.as(
       knex
