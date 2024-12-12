@@ -205,6 +205,7 @@ const createManager = async (req, res) => {
       name: user.name,
       email: user.email,
       uuid: user.user_uuid ?? user.uuid,
+      password: user.password,
     },
   });
 };
