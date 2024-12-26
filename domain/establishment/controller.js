@@ -4,6 +4,7 @@ const exceptions = require("../../repositories/exceptions");
 const { wrapRequests } = require("../../helpers/controller");
 const { RoleTypes } = require("../../constants/entities");
 const dto = require("./dto.js");
+const registerLessons = require("../../tasks/registerLessons");
 
 const getEstablishments = async (_, res) => {
   const establishments = await repositories.establishment.findAll();
@@ -99,6 +100,7 @@ const updateTeacherToCourse = async (req, res) => {
   );
 
   await repositories.course.updateTeacher(user.id, course.id);
+  await registerLessons(user.id);
 
   res.json({ ok: true, user: dto.mapTeacher(user) });
 };

@@ -140,14 +140,14 @@ class UnitRepository {
         id: "unit.id",
         number: "unit.number",
         title: "unit.title",
-        lessons_finished: raw("COUNT(lesson_course.has_finished)"),
+        lessons_finished: raw("SUM(lesson_course.has_finished)"),
         total_lessons: raw("COUNT(lesson.id)"),
       })
       .from(ref("user").as("teacher"))
       .innerJoin("course", "course.teacher_id", "teacher.id")
-      .innerJoin("unit", "unit.grade_id", "course.grade_id")
-      .innerJoin("lesson", "lesson.unit_id", "unit.id")
-      .leftJoin("lesson_course", "lesson_course.lesson_id", "lesson.id")
+      .innerJoin("lesson_course", "lesson_course.course_id", "course.id")
+      .innerJoin("lesson", "lesson_course.lesson_id", "lesson.id")
+      .innerJoin("unit", "lesson.unit_id", "unit.id")
       .where("teacher.uuid", uuid)
       .groupBy("unit.id")
       .orderBy("unit.id");

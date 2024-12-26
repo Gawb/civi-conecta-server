@@ -2,8 +2,10 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = async function(knex) {
+exports.up = async function (knex) {
   const ref = knex.ref.bind(knex);
+
+  await knex.schema.dropViewIfExists("reports_planning_and_units");
 
   await knex.schema.createView("reports_planning_and_units", (view) => {
     view.as(
@@ -82,6 +84,6 @@ exports.up = async function(knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = async function(knex) {
+exports.down = async function (knex) {
   await knex.schema.dropViewIfExists("reports_planning_and_units");
 };

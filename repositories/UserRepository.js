@@ -177,6 +177,10 @@ class UserRepository {
       .first();
   }
 
+  findById(id) {
+    return this.connection.select().from("public.user").where("id", id).first();
+  }
+
   async storeRecoveryToken(userId, recoveryToken, tokenExpiration) {
     const fields = {
       recovery_token: recoveryToken,
@@ -228,6 +232,14 @@ class UserRepository {
       .innerJoin("course", "course.teacher_id", "user.id")
       .where("course.id", courseId)
       .first();
+  }
+
+  findByRole(roleType) {
+    return this.connection
+      .select()
+      .from("public.user")
+      .where("role", roleType)
+      .orderBy("id");
   }
 }
 

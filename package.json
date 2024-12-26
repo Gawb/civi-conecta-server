@@ -22,6 +22,7 @@
     "nanoid": "^4.0.1",
     "node-mailer": "^0.1.1",
     "pg": "^8.9.0",
+    "radiojs": "^1.0.3",
     "winston": "^3.10.0"
   },
   "devDependencies": {

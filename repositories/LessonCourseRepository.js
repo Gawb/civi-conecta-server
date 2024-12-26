@@ -21,6 +21,11 @@ class LessonCourseRepository {
     return this.connection.insert(fields).into("lesson_course");
   }
 
+  create(courseId, lessonId) {
+    const fields = { course_id: courseId, lesson_id: lessonId };
+    return this.connection.insert(fields).into("lesson_course");
+  }
+
   async updateDownloadContent(uuid, lessonId) {
     const courseId = await this._findCourseByTeacherUUID(uuid);
 

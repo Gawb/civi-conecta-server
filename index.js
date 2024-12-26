@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const errorHandlers = require("./middlewares/handleErrors");
 const logger = require("./helpers/logger");
+const registerListeners = require("./tasks/index.js");
 const app = express();
 
 app.use(express.json());
@@ -18,6 +19,8 @@ app.use(require("./routes"));
 
 app.use(errorHandlers.handleNotFound);
 app.use(errorHandlers.handleServerError);
+
+registerListeners();
 
 app.listen(config.env.port, config.env.host, () => {
   logger.info(
