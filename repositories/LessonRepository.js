@@ -108,22 +108,17 @@ class LessonRepository {
   }
 
   findByUnitIdAndTeacherUUID(unitId, uuid) {
-    const raw = this.connection.raw.bind(this.connection);
+    const ref = this.connection.ref.bind(this.connection);
 
     return this.connection
       .select("lesson.*")
-      .column({
-        has_entered_into_lesson: raw(
-          "CASE WHEN course.id IS NULL THEN 0 ELSE 1 END",
-        ),
-      })
-      .from("unit")
-      .innerJoin("lesson", "lesson.unit_id", "unit.id")
-      .leftJoin("lesson_course", "lesson_course.lesson_id", "lesson.id")
-      .leftJoin("course", "lesson_course.course_id", "course.id")
-      .leftJoin("public.user", "course.teacher_id", "public.user.id")
-      .where("unit.id", unitId)
-      .whereRaw("(public.user.uuid = ? OR public.user.uuid IS NULL)", [uuid])
+      .column({ has_finished: "lesson_course.has_finished" })
+      .from("lesson")
+      .innerJoin("lesson_course", "lesson_course.lesson_id", "lesson.id")
+      .innerJoin("course", "lesson_course.course_id", "course.id")
+      .innerJoin(ref("user").as("teacher"), "course.teacher_id", "teacher.id")
+      .where("lesson.unit_id", unitId)
+      .where("teacher.uuid", uuid)
       .orderBy("lesson.id");
   }
 

@@ -61,7 +61,7 @@ const mapUnitDashboard = (unit, lessons) => {
       number: lesson.number,
       objective: lesson.objective,
       description: lesson.description,
-      hasEnteredIntoLesson: Boolean(lesson.has_entered_into_lesson),
+      hasFinished: Boolean(lesson.has_finished),
     };
   });
 

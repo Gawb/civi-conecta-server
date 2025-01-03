@@ -1,3 +1,4 @@
+require("dotenv").config();
 const repositories = require("../repositories");
 const registerLessons = require("../tasks/registerLessons");
 

@@ -39,7 +39,7 @@ class LessonCourseRepository {
 
     return this.connection("lesson_course")
       .where({ course_id: courseId, lesson_id: lessonId })
-      .update("has_finished", 1);
+      .update({ has_finished: 1 });
   }
 
   async _findCourseByTeacherUUID(uuid) {

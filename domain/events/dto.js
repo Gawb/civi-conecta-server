@@ -10,7 +10,7 @@ const mapEvent = (data) => {
     date: data.date,
     files: data.files,
     keywords: data.keywords.split(","),
-    hasEnteredIntoLesson: Boolean(data.has_entered_into_lesson),
+    hasFinished: Boolean(data.has_finished_lesson),
   };
 };
 

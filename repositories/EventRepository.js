@@ -53,13 +53,7 @@ class EventRepository {
   }
 
   findByEventTypeId(eventTypeId, uuid, gradeId = null) {
-    console.log("eventTypeId", eventTypeId);
-    console.log("uuid", uuid);
-
     const ref = this.connection.ref.bind(this.connection);
-    const exp = this.connection.raw(
-      "CASE WHEN lesson_course.lesson_id IS NULL THEN 0 ELSE 1 END",
-    );
 
     const builder = this.connection
       .column({
@@ -73,16 +67,16 @@ class EventRepository {
         updated_at: "event.updated_at",
         lesson_id: "lesson.id",
         keywords: "planning.keywords",
-        has_entered_into_lesson: exp,
+        has_finished_lesson: "lesson_course.has_finished",
       })
-      .from("event")
-      .innerJoin("lesson", "lesson.event_id", "event.id")
+      .from("lesson")
       .innerJoin("planning", "planning.lesson_id", "lesson.id")
-      .leftJoin("lesson_course", "lesson_course.lesson_id", "lesson.id")
-      .leftJoin("course", "lesson_course.course_id", "course.id")
-      .leftJoin(ref("user").as("teacher"), "course.teacher_id", "teacher.id")
-      .where("event_type_id", eventTypeId)
-      .whereRaw("(teacher.uuid = ? OR teacher.uuid IS NULL)", [uuid]);
+      .innerJoin("event", "lesson.event_id", "event.id")
+      .innerJoin("lesson_course", "lesson_course.lesson_id", "lesson.id")
+      .innerJoin("course", "lesson_course.course_id", "course.id")
+      .innerJoin(ref("user").as("teacher"), "course.teacher_id", "teacher.id")
+      .where("event.event_type_id", eventTypeId)
+      .where("teacher.uuid", uuid);
 
     if (gradeId) {
       builder.where("event.grade_id", gradeId);
