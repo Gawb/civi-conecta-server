@@ -91,7 +91,7 @@ const checkLessonsCompletion = async (req, res) => {
 };
 
 const checkEventsCompletion = async (req, res) => {
-  const managerUUID = req.headers.uuid;
+  const managerUUID = req.params.managerUUID;
   const eventType = req.params.eventType;
   const gradeId = req.params.gradeId;
   let results;

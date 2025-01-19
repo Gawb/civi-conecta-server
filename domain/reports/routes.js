@@ -32,7 +32,7 @@ router.get(
 );
 
 router.get(
-  "/course/:gradeId/:eventType/event-completion",
+  "/course/:managerUUID/:gradeId/:eventType/event-completion",
   handlers.checkEventsCompletion,
 );
 router.get(

@@ -212,6 +212,7 @@ const mapLessonCompletion = (results) => {
         id: result.planning_id,
         topic: result.topic,
       },
+      eventType: result.event_type,
     };
   });
 };
