@@ -23,22 +23,29 @@ const getEventsByType = async (req, res) => {
   const gradeId = req.params.gradeId;
   const uuid = req.headers.uuid;
 
+  console.log(`[getEventsByType] Type: ${eventType}, Grade: ${gradeId}, User: ${req.user.role}, UUID: ${uuid}`);
+
   let events = [];
   const establishment = await resolveEstablishment(uuid, req);
+  console.log(`[getEventsByType] Resolved Establishment:`, establishment);
 
   if (establishment) {
+    console.log(`[getEventsByType] Fetching by Establishment ${establishment.establishment_id}`);
     events = await repositories.event.findByEventTypeIdAndEstablishment(
       eventType,
       establishment.establishment_id,
       gradeId,
     );
   } else {
+    console.log(`[getEventsByType] Fetching by Teacher UUID`);
     events = await repositories.event.findByEventTypeId(
       eventType,
       uuid,
       gradeId,
     );
   }
+
+  console.log(`[getEventsByType] Found ${events.length} events`);
   const results = [];
 
   for (const event of events) {
