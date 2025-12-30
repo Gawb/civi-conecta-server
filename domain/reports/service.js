@@ -22,6 +22,15 @@ class ReportService {
 
     return dto.planningUnitsReport(report);
   }
+
+  async findPlanningAndUnitsReportByEstablishment(establishmentId, gradeId) {
+    const report = await repositories.report.getPlanningAndUnitsByEstablishment(
+      establishmentId,
+      gradeId,
+    );
+
+    return dto.planningUnitsReport(report);
+  }
 }
 
 module.exports = ReportService;

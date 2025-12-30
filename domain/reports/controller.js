@@ -1,6 +1,20 @@
 const { wrapRequests } = require("../../helpers/controller");
-const { EventTypes } = require("../../constants/entities");
+const { EventTypes, RoleTypes } = require("../../constants/entities");
 const ReportService = require("./service");
+
+const resolveEstablishment = async (managerUUID, req) => {
+  let establishment = await repositories.establishment.findByManager(managerUUID);
+  if (!establishment && req.user.role === RoleTypes.ADMIN) {
+    const establishments = await repositories.establishment.findAll();
+    if (establishments.length) {
+      establishment = {
+        establishment_id: establishments[0].id,
+        establishment_name: establishments[0].name,
+      };
+    }
+  }
+  return establishment;
+};
 const repositories = require("../../repositories");
 const dto = require("./dto");
 
@@ -48,7 +62,12 @@ const getUnitsOrder = async (req, res) => {
 const getSurveysReports = async (req, res) => {
   const uuid = req.params.managerUUID;
   const gradeId = req.params.gradeId;
-  const establishment = await repositories.establishment.findByManager(uuid);
+  const establishment = await resolveEstablishment(uuid, req);
+
+  if (!establishment) {
+    return res.json({ ok: true, results: [] });
+  }
+
   const surveyResults = await repositories.report.getSurveyResults(
     establishment.establishment_id,
     gradeId,
@@ -94,18 +113,21 @@ const checkEventsCompletion = async (req, res) => {
   const managerUUID = req.params.managerUUID;
   const eventType = req.params.eventType;
   const gradeId = req.params.gradeId;
-  let results;
+  const establishment = await resolveEstablishment(managerUUID, req);
+  let results = [];
 
-  if (eventType === EventTypes.SITUATION_TEXT) {
-    results = await repositories.report.getReportsSituation(
-      managerUUID,
-      gradeId,
-    );
-  } else if (eventType === EventTypes.EPHEMERIS_TEXT) {
-    results = await repositories.report.getReportsEphemeris(
-      managerUUID,
-      gradeId,
-    );
+  if (establishment) {
+    if (eventType === EventTypes.SITUATION_TEXT) {
+      results = await repositories.report.getReportsSituationByEstablishment(
+        establishment.establishment_id,
+        gradeId,
+      );
+    } else if (eventType === EventTypes.EPHEMERIS_TEXT) {
+      results = await repositories.report.getReportsEphemerisByEstablishment(
+        establishment.establishment_id,
+        gradeId,
+      );
+    }
   }
 
   res.json({ ok: true, eventType, results: dto.mapEvents(results, eventType) });
@@ -114,11 +136,17 @@ const checkEventsCompletion = async (req, res) => {
 const getPlanningUnitsReports = async (req, res) => {
   const managerUUID = req.user.uuid;
   const gradeId = req.params.gradeId;
-  const reportService = new ReportService();
-  const report = await reportService.findPlanningAndUnitsReport(
-    managerUUID,
-    gradeId,
-  );
+  const establishment = await resolveEstablishment(managerUUID, req);
+  let report = null;
+
+  if (establishment) {
+    const reportService = new ReportService();
+    report = await reportService.findPlanningAndUnitsReportByEstablishment(
+      establishment.establishment_id,
+      gradeId,
+    );
+  }
+
   res.json({ ok: true, report });
 };
 

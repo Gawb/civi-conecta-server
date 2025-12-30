@@ -33,8 +33,23 @@ const getCoursesFromEstablishment = async (req, res) => {
 
 const getCoursesByManager = async (req, res) => {
   const managerId = req.params.managerId;
-  const establishment =
+  let establishment =
     await repositories.establishment.findByManager(managerId);
+
+  if (!establishment && req.user.role === RoleTypes.ADMIN) {
+    const establishments = await repositories.establishment.findAll();
+    if (establishments.length) {
+      establishment = {
+        establishment_id: establishments[0].id,
+        establishment_name: establishments[0].name,
+      };
+    }
+  }
+
+  if (!establishment) {
+    return res.json({ ok: true, courses: [], establishment: null });
+  }
+
   const courses = await repositories.course.findGradesByEstablishment(
     establishment.establishment_id,
   );
