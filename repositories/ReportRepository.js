@@ -173,6 +173,14 @@ class ReportRepository {
       .where("reports_situations.grade_id", gradeId);
   }
 
+  getReportsSituationByEstablishment(establishmentId, gradeId) {
+    return this.connection
+      .select("reports_situations.*")
+      .from("reports_situations")
+      .where("reports_situations.id", establishmentId)
+      .where("reports_situations.grade_id", gradeId);
+  }
+
   getReportsEphemeris(managerUUID, gradeId) {
     const ref = this.connection.ref.bind(this.connection);
 
@@ -193,6 +201,14 @@ class ReportRepository {
       .where("reports_ephemeris.grade_id", gradeId);
   }
 
+  getReportsEphemerisByEstablishment(establishmentId, gradeId) {
+    return this.connection
+      .select("reports_ephemeris.*")
+      .from("reports_ephemeris")
+      .where("reports_ephemeris.id", establishmentId)
+      .where("reports_ephemeris.grade_id", gradeId);
+  }
+
   getPlanningAndUnits(managerUUID, gradeId) {
     const ref = this.connection.ref.bind(this.connection);
 
@@ -210,6 +226,14 @@ class ReportRepository {
         "manager.id",
       )
       .where("manager.uuid", managerUUID)
+      .where("grade_id", gradeId);
+  }
+
+  getPlanningAndUnitsByEstablishment(establishmentId, gradeId) {
+    return this.connection
+      .select("reports_planning_and_units.*")
+      .from("reports_planning_and_units")
+      .where("establishment_id", establishmentId)
       .where("grade_id", gradeId);
   }
 }
