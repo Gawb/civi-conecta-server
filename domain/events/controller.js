@@ -1,16 +1,44 @@
 const repositories = require("../../repositories");
 const { wrapRequests } = require("../../helpers/controller");
 const dto = require("./dto");
+const { RoleTypes } = require("../../constants/entities");
+
+const resolveEstablishment = async (managerUUID, req) => {
+  let establishment =
+    await repositories.establishment.findByManager(managerUUID);
+  if (!establishment && req.user.role === RoleTypes.ADMIN) {
+    const establishments = await repositories.establishment.findAll();
+    if (establishments.length) {
+      establishment = {
+        establishment_id: establishments[0].id,
+        establishment_name: establishments[0].name,
+      };
+    }
+  }
+  return establishment;
+};
 
 const getEventsByType = async (req, res) => {
   const eventType = req.params.eventType;
   const gradeId = req.params.gradeId;
   const uuid = req.headers.uuid;
-  const events = await repositories.event.findByEventTypeId(
-    eventType,
-    uuid,
-    gradeId,
-  );
+
+  let events = [];
+  const establishment = await resolveEstablishment(uuid, req);
+
+  if (establishment) {
+    events = await repositories.event.findByEventTypeIdAndEstablishment(
+      eventType,
+      establishment.establishment_id,
+      gradeId,
+    );
+  } else {
+    events = await repositories.event.findByEventTypeId(
+      eventType,
+      uuid,
+      gradeId,
+    );
+  }
   const results = [];
 
   for (const event of events) {
