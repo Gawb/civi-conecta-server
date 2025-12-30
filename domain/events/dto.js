@@ -6,10 +6,10 @@ const mapEvent = (data) => {
     id: data.id,
     lessonId: data.lesson_id,
     title: data.title,
-    description: data.description,
+    description: data.description || "",
     date: data.date,
     files: data.files,
-    keywords: data.keywords.split(","),
+    keywords: (typeof data.keywords === 'string') ? data.keywords.split(",") : [],
     hasFinished: Boolean(data.has_finished_lesson),
   };
 };
