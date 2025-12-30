@@ -29,7 +29,13 @@ const getEventsByType = async (req, res) => {
   const establishment = await resolveEstablishment(uuid, req);
   console.log(`[getEventsByType] Resolved Establishment:`, establishment);
 
-  if (establishment) {
+  if (req.user.role === RoleTypes.ADMIN) {
+    console.log(`[getEventsByType] Admin User detected. Fetching ALL events for Grade ${gradeId} regardless of establishment.`);
+    events = await repositories.event.findAllByEventTypeId(
+      eventType,
+      gradeId
+    );
+  } else if (establishment) {
     console.log(`[getEventsByType] Fetching by Establishment ${establishment.establishment_id}`);
     events = await repositories.event.findByEventTypeIdAndEstablishment(
       eventType,
@@ -45,7 +51,12 @@ const getEventsByType = async (req, res) => {
     );
   }
 
-  console.log(`[getEventsByType] Found ${events.length} events`);
+  // Deduplicate events by ID (in case multiple courses link to same event)
+  const uniqueEventsMap = new Map();
+  events.forEach(e => uniqueEventsMap.set(e.id, e));
+  events = Array.from(uniqueEventsMap.values());
+
+  console.log(`[getEventsByType] Found ${events.length} unique events`);
   const results = [];
 
   for (const event of events) {
