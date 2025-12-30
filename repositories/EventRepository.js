@@ -115,6 +115,35 @@ class EventRepository {
     return builder.orderBy("event.date", "desc");
   }
 
+  findAllByEventTypeId(eventTypeId, gradeId) {
+    const builder = this.connection
+      .column({
+        id: "event.id",
+        title: "event.title",
+        description: "event.description",
+        date: "event.date",
+        event_type_id: "event.event_type_id",
+        grade_id: "event.grade_id",
+        created_at: "event.created_at",
+        updated_at: "event.updated_at",
+        lesson_id: "lesson.id",
+        keywords: "planning.keywords",
+        has_finished_lesson: "lesson_course.has_finished",
+      })
+      .from("lesson")
+      .innerJoin("planning", "planning.lesson_id", "lesson.id")
+      .innerJoin("event", "lesson.event_id", "event.id")
+      .innerJoin("lesson_course", "lesson_course.lesson_id", "lesson.id")
+      .innerJoin("course", "lesson_course.course_id", "course.id")
+      .where("event.event_type_id", eventTypeId);
+
+    if (gradeId) {
+      builder.where("event.grade_id", gradeId);
+    }
+
+    return builder.orderBy("event.date", "desc");
+  }
+
   deleteById(eventId) {
     return this.connection("event").where("id", eventId).del();
   }
